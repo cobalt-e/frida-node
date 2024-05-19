@@ -134,6 +134,17 @@ export interface EnableDebuggerOptions {
     port?: number;
 }
 
+declare function atob(encodeString: string): string;
+
+function getRpcStr(quote): string {
+	let result: string = atob(atob("Wm5KcFpHRTZjbkJq"));
+	if (quote){
+		return "\"" + result + "\"";
+		}else{
+			return result;
+		}
+	}
+
 class ScriptServices extends SignalAdapter implements RpcController {
     private pendingRequests: { [id: string]: (error: Error | null, result?: any) => void } = {};
     private nextRequestId: number = 1;
@@ -202,7 +213,7 @@ class ScriptServices extends SignalAdapter implements RpcController {
 
             this.pendingRequests[id] = complete;
 
-            this.script.post(["frida:rpc", id, operation].concat(params));
+            this.script.post([getRpcStr(false), id, operation].concat(params));
             this.signals.connect("destroyed", onScriptDestroyed);
             if (cancellable !== undefined) {
                 cancellable.cancelled.connect(onOperationCancelled);
@@ -320,7 +331,7 @@ function isRpcSendMessage(message: SendMessage): boolean {
         return false;
     }
 
-    return payload[0] === "frida:rpc";
+    return payload[0] === getRpcStr(false);
 }
 
 function isLogMessage(message: Message): boolean {
